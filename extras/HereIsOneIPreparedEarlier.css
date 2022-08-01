@@ -72,6 +72,22 @@ button {
   background: rgb(0, 98, 163);
 }
 
+input {
+  margin: 10px;
+  font-size: 18px;
+  border: 0;
+  padding: 10px 16px;
+  border-radius: 10px;
+}
+
+.money {
+  margin: 10px;
+  font-size: 18px;
+  border: 0;
+  padding: 10px 16px;
+  border-radius: 10px;
+}
+
 button:hover {
   cursor: pointer;
   background: rgb(35, 133, 199);
