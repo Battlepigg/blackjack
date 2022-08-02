@@ -36,28 +36,28 @@ class Card {
         this.suit = suit
         this.value = value
         this.image = imageArr[value - 1] + suit + '.png'
-        this.ponts = this.points()
+        // this.ponts = this.points()
     }
 
-    ponts(){
+    // ponts(){
 
-        switch(this.value){
-            case 1:
-                this.ponts += 11
-                this.points += 1
-                break
+    //     switch(this.value){
+    //         case 1:
+    //             this.ponts += 11
+    //             this.points += 1
+    //             break
 
-            case 11:
-            case 12:
-            case 13:
-                this.points += 10
-                break
+    //         case 11:
+    //         case 12:
+    //         case 13:
+    //             this.points += 10
+    //             break
 
-            default:
-                this.points += this.value
-                break
-        }
-    }
+    //         default:
+    //             this.points += this.value
+    //             break
+    //     }
+    // }
 }
 
 class Deck {
@@ -67,24 +67,24 @@ class Deck {
 
     count(card){
 
-        this.value += card.points
+        // this.value += card.points
 
-        // switch(card.value){
-        //     case 1:
-        //         this.value += 11
-        //         this.aces += 1
-        //         break
+        switch(card.value){
+            case 1:
+                this.value += 11
+                this.aces += 1
+                break
 
-        //     case 11:
-        //     case 12:
-        //     case 13:
-        //         this.value += 10
-        //         break
+            case 11:
+            case 12:
+            case 13:
+                this.value += 10
+                break
 
-        //     default:
-        //         this.value += card.value
-        //         break
-        // }
+            default:
+                this.value += card.value
+                break
+        }
 
         updatePoints()
 
