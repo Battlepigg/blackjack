@@ -8,7 +8,6 @@
   <link rel="stylesheet" href="extras/HereIsOneIPreparedEarlier.css">
 </head>
 <body>
-  <div class="message-box" id="messages"></div>
   <div class="table">
     <div class="player" id="dealer">
       <label class="player-name">Dealer: 
@@ -30,11 +29,13 @@
       <button id="deal-button" class ="deal-hit" type="button">Deal</button>
       <!-- <button id="hit-button" type="button" >Hit</button> -->
       <button id="stand-button" type="button" disabled>Stand</button>
-      <input type="text" id="bet" placeholder="Min bet: $20">
+      <button id="split-button" type="button" disabled>Split</button>
+      <textarea type="text" id="bet" placeholder="Place your bet here!"></textarea>
       <div class="money">
         <div id="money">You have $500</div>
       </div>
     </div>
   </div>
+  <div class="message-box" id="messages"></div>
 </body>
 </html>

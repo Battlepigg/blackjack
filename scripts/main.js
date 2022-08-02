@@ -4,7 +4,10 @@ const table = document.querySelector('.table')
 const buttons = table.querySelector('#buttons')
 const dealHit = buttons.querySelector('.deal-hit')
 const standButton = buttons.querySelector('#stand-button')
+
 const betInput = buttons.querySelector ('#bet')
+const money = buttons.querySelector('#money')
+const minBet = 20
 
 const player = table.querySelector('#player-hand')
 const dealer = table.querySelector('#dealer-hand')
@@ -33,6 +36,27 @@ class Card {
         this.suit = suit
         this.value = value
         this.image = imageArr[value - 1] + suit + '.png'
+        this.ponts = this.points()
+    }
+
+    ponts(){
+
+        switch(this.value){
+            case 1:
+                this.ponts += 11
+                this.points += 1
+                break
+
+            case 11:
+            case 12:
+            case 13:
+                this.points += 10
+                break
+
+            default:
+                this.points += this.value
+                break
+        }
     }
 }
 
@@ -42,27 +66,31 @@ class Deck {
     value = 0
 
     count(card){
-        switch(card.value){
-            case 1:
-                this.value += 11
-                this.aces += 1
-                break
-            
-            case 11:
-            case 12:
-            case 13:
-                this.value += 10
-                break
 
-            default:
-                this.value += card.value
-                break
-        }
+        this.value += card.points
+
+        // switch(card.value){
+        //     case 1:
+        //         this.value += 11
+        //         this.aces += 1
+        //         break
+
+        //     case 11:
+        //     case 12:
+        //     case 13:
+        //         this.value += 10
+        //         break
+
+        //     default:
+        //         this.value += card.value
+        //         break
+        // }
 
         updatePoints()
 
         if (this.value === 21){
             messages.textContent = 'BlackJack!'
+            player.money += (player.bet * 2)
             reset()
         }else
 
@@ -73,12 +101,11 @@ class Deck {
                 this.aces -= 1
                 updatePoints()
             }
-
             else{
                 messages.textContent = 'Bust!'
                 reset()
             }
-        }
+        } 
     }
 
     fill(){
@@ -92,7 +119,7 @@ class Deck {
     }
 
     shuffle(){
-        for(let i = 51; i > 0; i --){
+        for(let i = (this.cards.length - 1); i > 0; i --){
             let num1 = Math.floor((i+1)*Math.random(i));
             let swapCard = this.cards[num1]
             this.cards[num1] = this.cards[i]
@@ -106,32 +133,57 @@ class Deck {
         this.count(card)
         displayCards(player)
     }
+
+    split(){
+        if (this.cards[0].value == this.cards[1].value){
+            console.log('split');
+        }
+    }
 }
 
 //End of deck class
 
 const deal = () => {
-    dealHit.id = 'hit-button'
-    dealHit.textContent = 'Hit'
-    standButton.disabled = false
-
+    player.bet = parseInt(betInput.value)
     messages.textContent = ''
-    
+
     if(table.hand.cards.length < 10){
-        console.log('making a new deck');
         newDeck()
     }
 
-    player.innerHTML = ''
-    dealer.innerHTML = ''
+    if(player.money == 0){
+        messages.textContent = "Sorry! You're out of money. There's an ATM down the block"
+    }else
 
-    player.hand = new Deck()
-    dealer.hand = new Deck()
+    if(player.bet <= player.money){
+        player.money -= player.bet
 
-    player.hand.hit(player)
-    
-    player.hand.hit(player)
-    dealer.hand.hit(dealer) 
+        dealHit.id = 'hit-button'
+        dealHit.textContent = 'Hit'
+
+        standButton.disabled = false
+        betInput.value = `Your bet is $${player.bet}`
+        betInput.disabled = true
+
+        player.innerHTML = ''
+        dealer.innerHTML = ''
+
+        player.hand = new Deck()
+        dealer.hand = new Deck()
+
+        player.hand.hit(player)
+        
+        player.hand.hit(player)
+        dealer.hand.hit(dealer)
+        player.hand.split()
+    }else
+    if(player.bet > player.money){
+        messages.textContent = "Bet too high"
+    }
+    else{
+        messages.textContent = "You need to place a bet to play the game!"
+    }
+
 }
 
 const stand = () => {
@@ -143,19 +195,20 @@ const stand = () => {
 
     if(dealer.hand.value > 21 || (player.hand.value > dealer.hand.value)){
         messages.textContent = 'You win!'
+        player.money += (player.bet * 2)
+        reset()
     }else
 
     if(dealer.hand.value === player.hand.value){
         messages.textContent = "Tie, you don't lose or gain money"
+        player.money += player.bet
         reset()
     }
-    
+
     else{
         messages.textContent = 'You lose!'
+        reset()
     }
-
-    dealHit.id = 'deal-button'
-    dealHit.textContent = 'Deal'
 }
 
 const newDeck = () => {
@@ -164,6 +217,7 @@ const newDeck = () => {
 
         deck.fill()
         deck.shuffle()
+        console.log(deck);
 
         messages.textContent = 'A new deck was shuffled'
 }
@@ -176,39 +230,84 @@ const displayCards = (player) => {
 }
 
 const updatePoints = () => {
-    let playerPoints = table.querySelector('#player-points')
-    let dealerPoints = table.querySelector('#dealer-points')
-
     playerPoints.textContent = player.hand.value
     dealerPoints.textContent = dealer.hand.value
 }
 
 const reset = () => {
-    //todo handle betting here
     dealHit.id = 'deal-button'
     dealHit.textContent = 'Deal'
+
+    betInput.value = player.bet
+    betInput.disabled = false
     standButton.disabled = true
+
+    money.textContent = `You have $${player.money}`
 }
 
+//! Main Loop
+
 const game = () => {
-    //main loop
     newDeck()
+    player.money = 500
 
     buttons.addEventListener('click', event => {
         switch(event.target.id){
             case 'deal-button':
                 deal()
                 break
-            
+
             case 'hit-button':
                 player.hand.hit(player)
                 break
-            
+
             case 'stand-button':
                 stand()
                 break
         }
     })
-} 
+
+    document.addEventListener('keydown', event => {
+        switch(event.key){
+            case 'ArrowUp':
+            case (' '):
+                if(dealHit.textContent === 'Deal'){
+                    deal()
+                }else
+                if(dealHit.textContent === 'Hit'){
+                    player.hand.hit(player)
+                }
+                break
+
+            case 'ArrowDown':
+                if(standButton.disabled === false){
+                    stand()
+                }
+                break
+
+            case 'ArrowLeft':
+                if(betInput.disabled === false){
+                    if(betInput.value == 0){
+                        betInput.value = minBet
+                    }
+                    else{
+                        betInput.value = parseInt(betInput.value) - 10
+                    }
+                }
+                break
+
+            case 'ArrowRight':
+                if(betInput.disabled === false){
+                    if(betInput.value == 0){
+                        betInput.value = minBet
+                    }
+                    else{
+                        betInput.value = parseInt(betInput.value) + 10
+                    }
+                }
+                break
+        }
+    })
+}
 
 game()
